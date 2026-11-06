@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Petualangan Pesawat Kata: Kalimat Ajakan (Kelas 2 Fase A)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Fredoka & Nunito for kid-friendly readability -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --sky-top: #38bdf8;
+            --sky-bottom: #bae6fd;
+        }
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(180deg, #38bdf8 0%, #bae6fd 65%, #dcfce7 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+        }
+        h1, h2, h3, .font-title {
+            font-family: 'Fredoka', sans-serif;
+        }
+        /* Animated Floating Clouds Background */
+        .cloud-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 9999px;
+            filter: drop-shadow(0 8px 12px rgba(14, 165, 233, 0.15));
+            animation: floatCloud linear infinite;
+        }
+        @keyframes floatCloud {
+            from { transform: translateX(-250px); }
+            to { transform: translateX(110vw); }
+        }
+        /* Bubble 3D Kids Button */
+        .btn-kid {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.2);
+        }
+        .btn-kid:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+        }
+        .btn-kid-yellow {
+            background: linear-gradient(180deg, #fde047 0%, #eab308 100%);
+            box-shadow: 0 6px 0 #a16207;
+            color: #422006;
+        }
+        .btn-kid-blue {
+            background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+            box-shadow: 0 6px 0 #0369a1;
+            color: white;
+        }
+        .btn-kid-green {
+            background: linear-gradient(180deg, #4ade80 0%, #16a34a 100%);
+            box-shadow: 0 6px 0 #15803d;
+            color: white;
+        }
+        .btn-kid-red {
+            background: linear-gradient(180deg, #f87171 0%, #dc2626 100%);
+            box-shadow: 0 6px 0 #991b1b;
+            color: white;
+        }
+        .btn-kid-purple {
+            background: linear-gradient(180deg, #c084fc 0%, #9333ea 100%);
+            box-shadow: 0 6px 0 #6b21a8;
+            color: white;
+        }
+        /* Gentle Bounce for Plane Icon */
+        @keyframes planeHover {
+            0%, 100% { transform: translateY(0px) rotate(-2deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+        .plane-bounce {
+            animation: planeHover 3s ease-in-out infinite;
+        }
+        /* Game Canvas Container */
+        #gameCanvas {
+            background: linear-gradient(180deg, #0284c7 0%, #38bdf8 50%, #e0f2fe 100%);
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e0f2fe;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #38bdf8;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="relative text-slate-800">
+
+    <!-- Animated Sky Clouds Background -->
+    <div class="cloud-bg" aria-hidden="true">
+        <div class="cloud w-40 h-14 top-10" style="animation-duration: 38s; animation-delay: -5s;"></div>
+        <div class="cloud w-56 h-20 top-32" style="animation-duration: 52s; animation-delay: -20s;"></div>
+        <div class="cloud w-36 h-12 top-64" style="animation-duration: 44s; animation-delay: -12s;"></div>
+        <div class="cloud w-64 h-22 bottom-24" style="animation-duration: 60s; animation-delay: -32s;"></div>
+    </div>
+
+    <!-- Custom Toast / Alert Message Box (No window.alert) -->
+    <div id="toastBox" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 hidden transform transition-all duration-300">
+        <div id="toastContent" class="flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border-4 border-white font-bold text-lg">
+            <i id="toastIcon" class="fa-solid fa-circle-exclamation text-2xl"></i>
+            <span id="toastText">Pesan di sini</span>
+        </div>
+    </div>
+
+    <!-- Top Bar (Visible after login) -->
+    <header id="topHeader" class="hidden relative z-20 max-w-6xl mx-auto pt-3 px-4">
+        <div class="bg-white/95 backdrop-blur-md rounded-3xl p-3 sm:px-6 shadow-xl border-4 border-sky-300 flex flex-wrap items-center justify-between gap-3">
+            <!-- Brand & Back to Menu -->
+            <div class="flex items-center gap-3">
+                <button onclick="navigateTo('menu')" class="btn-kid btn-kid-yellow px-4 py-2 rounded-2xl font-title font-bold text-sm sm:text-base flex items-center gap-2">
+                    <i class="fa-solid fa-house-chimney"></i>
+                    <span>Menu Utama</span>
+                </button>
+                <div class="hidden md:block">
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-sky-600 block">Bahasa Indonesia • Kelas 2 Fase A</span>
+                    <h1 class="font-title font-bold text-lg text-slate-800 leading-tight">Petualangan Pesawat Kata</h1>
+                </div>
+            </div>
+
+            <!-- Student Info & Audio Controls -->
+            <div class="flex items-center gap-2 sm:gap-4 ml-auto">
+                <div class="bg-sky-50 border-2 border-sky-200 px-3 py-1.5 rounded-2xl flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-amber-400 text-amber-950 flex items-center justify-center font-title font-bold text-lg shadow-inner">
+                        <i class="fa-solid fa-user-astronaut"></i>
+                    </div>
+                    <div class="text-xs sm:text-sm">
+                        <p class="font-extrabold text-slate-800 leading-none" id="headerStudentName">Kapten Cilik</p>
+                        <p class="text-sky-700 font-bold mt-0.5" id="headerStudentClass">Kelas 2A</p>
+                    </div>
+                </div>
+
+                <!-- Score Pill -->
+                <div class="hidden sm:flex bg-amber-50 border-2 border-amber-300 px-3 py-1.5 rounded-2xl items-center gap-2">
+                    <i class="fa-solid fa-star text-amber-400 text-lg"></i>
+                    <span class="font-title font-bold text-amber-900 text-sm" id="headerHighScore">Skor Game: 0</span>
+                </div>
+
+                <!-- Mute/Unmute Sound Button -->
+                <button onclick="toggleSound()" id="soundBtn" class="btn-kid btn-kid-blue w-11 h-11 rounded-2xl flex items-center justify-center text-lg" title="Suara Efek">
+                    <i id="soundIcon" class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="relative z-10 max-w-6xl mx-auto px-4 py-6">
+
+        <!-- ==========================================
+             1. HALAMAN UTAMA (LOGIN / WELCOME SCREEN)
+             ========================================== -->
+        <section id="view-login" class="min-h-[85vh] flex items-center justify-center">
+            <div class="bg-white/95 backdrop-blur-md rounded-[2.5rem] p-6 sm:p-10 shadow-2xl border-8 border-sky-300 max-w-xl w-full text-center relative overflow-hidden">
+                <!-- Decorative Ribbon Badge -->
+                <div class="inline-flex items-center gap-2 bg-amber-100 border-2 border-amber-400 text-amber-900 px-4 py-1.5 rounded-full font-extrabold text-xs sm:text-sm mb-4">
+                    <i class="fa-solid fa-graduation-cap text-amber-600"></i>
+                    <span>BAHASA INDONESIA • KELAS 2 SD (FASE A)</span>
+                </div>
+
+                <!-- Hero Cartoon Plane Illustration (SVG) -->
+                <div class="my-2 flex justify-center">
+                    <div class="plane-bounce w-36 h-28 sm:w-44 sm:h-32 relative">
+                        <svg viewBox="0 0 220 150" class="w-full h-full drop-shadow-lg">
+                            <!-- Clouds behind plane -->
+                            <circle cx="45" cy="110" r="18" fill="#e0f2fe" />
+                            <circle cx="175" cy="40" r="14" fill="#e0f2fe" />
+                            <!-- Fuselage -->
+                            <path d="M35 80 C35 50, 140 45, 175 75 C190 85, 190 100, 170 105 L45 105 C30 105, 25 90, 35 80 Z" fill="#ef4444" stroke="#991b1b" stroke-width="4"/>
+                            <!-- Tail Wing -->
+                            <path d="M35 80 L15 45 L45 50 L60 75 Z" fill="#facc15" stroke="#854d0e" stroke-width="4" stroke-linejoin="round"/>
+                            <!-- Cockpit Canopy -->
+                            <path d="M95 62 C110 40, 145 45, 152 68 Z" fill="#bae6fd" stroke="#0369a1" stroke-width="4"/>
+                            <!-- Cute Pilot Head -->
+                            <circle cx="122" cy="58" r="10" fill="#fde047" stroke="#854d0e" stroke-width="3"/>
+                            <circle cx="125" cy="56" r="2" fill="#1e293b"/>
+                            <!-- Top & Bottom Biplane Wings -->
+                            <rect x="75" y="34" width="75" height="12" rx="6" fill="#facc15" stroke="#854d0e" stroke-width="4"/>
+                            <rect x="80" y="96" width="70" height="12" rx="6" fill="#facc15" stroke="#854d0e" stroke-width="4"/>
+                            <!-- Wing Struts -->
+                            <line x1="95" y1="46" x2="95" y2="96" stroke="#78350f" stroke-width="4"/>
+                            <line x1="135" y1="46" x2="135" y2="96" stroke="#78350f" stroke-width="4"/>
+                            <!-- Nose Cone & Propeller -->
+                            <path d="M175 73 C192 76, 192 100, 175 103 Z" fill="#facc15" stroke="#854d0e" stroke-width="4"/>
+                            <ellipse cx="192" cy="88" rx="4" ry="26" fill="#e2e8f0" stroke="#475569" stroke-width="3"/>
+                            <!-- Star Decal -->
+                            <circle cx="72" cy="83" r="11" fill="#ffffff" stroke="#991b1b" stroke-width="3"/>
+                            <polygon points="72,74 74,80 80,80 75,84 77,90 72,86 67,90 69,84 64,80 70,80" fill="#facc15"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Main Title -->
+                <h1 class="font-title text-3xl sm:text-4xl font-bold text-sky-900 tracking-tight">
+                    Petualangan Pesawat Kata
+                </h1>
+                <p class="font-title text-xl sm:text-2xl font-bold text-amber-500 mt-1 mb-6 drop-shadow-sm">
+                    ✨ Mengenal Kalimat Ajakan ✨
+                </p>
+
+                <!-- Login Form Inputs -->
+                <div class="space-y-4 text-left bg-sky-50/90 p-5 sm:p-6 rounded-3xl border-2 border-sky-200 mb-6">
+                    <div>
+                        <label for="inputNama" class="block font-title font-bold text-sky-900 text-base sm:text-lg mb-1.5">
+                            <i class="fa-solid fa-id-card text-sky-500 mr-1.5"></i> Nama Lengkap Murid:
+                        </label>
+                        <input id="inputNama" type="text" placeholder="Contoh: Budi Santoso" maxlength="30"
+                            class="w-full px-4 py-3.5 rounded-2xl border-3 border-sky-300 focus:border-amber-400 focus:outline-none text-lg font-bold text-slate-800 bg-white shadow-inner"
+                            onkeydown="if(event.key==='Enter') handleStartApp()">
+                    </div>
+
+                    <div>
+                        <label for="inputKelas" class="block font-title font-bold text-sky-900 text-base sm:text-lg mb-1.5">
+                            <i class="fa-solid fa-school text-sky-500 mr-1.5"></i> Kelas:
+                        </label>
+                        <input id="inputKelas" type="text" placeholder="Contoh: Kelas 2A / 2 SD" maxlength="20"
+                            class="w-full px-4 py-3.5 rounded-2xl border-3 border-sky-300 focus:border-amber-400 focus:outline-none text-lg font-bold text-slate-800 bg-white shadow-inner"
+                            onkeydown="if(event.key==='Enter') handleStartApp()">
+                    </div>
+                </div>
+
+                <!-- Big Start Button -->
+                <button onclick="handleStartApp()" class="btn-kid btn-kid-green w-full py-4 px-8 rounded-3xl font-title font-bold text-2xl tracking-wide flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-plane-departure text-2xl"></i>
+                    <span>MULAI PETUALANGAN!</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             2. DASHBOARD / MENU UTAMA
+             ========================================== -->
+        <section id="view-menu" class="hidden space-y-6">
+            <!-- Hero Welcome Banner -->
+            <div class="bg-gradient-to-r from-sky-600 via-sky-500 to-cyan-500 rounded-[2rem] p-6 sm:p-8 text-white shadow-xl border-4 border-white flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="space-y-2 text-center md:text-left">
+                    <span class="inline-block bg-white/25 backdrop-blur-sm px-4 py-1 rounded-full text-xs sm:text-sm font-extrabold uppercase tracking-wider">
+                        👋 Halo, Kapten Pilot <span id="welcomeBannerName">Hebat</span>!
+                    </span>
+                    <h2 class="font-title text-2xl sm:text-4xl font-bold">Siap Terbang Belajar Kalimat Ajakan?</h2>
+                    <p class="text-sky-100 font-semibold text-sm sm:text-base max-w-xl">
+                        Pilih menu di bawah ini secara berurutan ya! Mulai dari membaca tujuan pembelajaran, materi inti, bermain tembak pesawat kata, hingga evaluasi.
+                    </p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="navigateTo('game')" class="btn-kid btn-kid-yellow px-6 py-4 rounded-3xl font-title font-bold text-lg flex items-center gap-2.5 shrink-0">
+                        <i class="fa-solid fa-gamepad text-2xl"></i>
+                        <span>Langsung Main Game!</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 6 Navigation Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Card 1: Tujuan Pembelajaran -->
+                <div onclick="navigateTo('tujuan')" class="cursor-pointer group bg-white rounded-3xl p-6 shadow-xl border-4 border-sky-200 hover:border-amber-400 transition-all hover:-translate-y-1 flex flex-col justify-between">
+                    <div>
+                        <div class="w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform shadow-sm">
+                            <i class="fa-solid fa-bullseye"></i>
+                        </div>
+                        <span class="text-xs font-extrabold uppercase tracking-wider text-amber-600 bg-amber-50 px-3 py-1 rounded-full">Langkah 1</span>
+                        <h3 class="font-title text-2xl font-bold text-slate-800 mt-2">Tujuan Pembelajaran</h3>
+                        <p class="text-slate-600 text-sm mt-1 font-semibold">
+                            Cari tahu apa saja yang akan kita capai pada pelajaran Kalimat Ajakan hari ini!
+                        </p>
+                    </div>
+                    <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-amber-600 font-extrabold text-sm">
+                        <span>Buka Tujuan</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+
+                <!-- Card 2: Panduan Penggunaan -->
+                <div onclick="navigateTo('panduan')" class="cursor-pointer group bg-white rounded-3xl p-6 shadow-xl border-4 border-sky-200 hover:border-purple-400 transition-all hover:-translate-y-1 flex flex-col justify-between">
+                    <div>
+                        <div class="w-16 h-16 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform shadow-sm">
+                            <i class="fa-solid fa-compass"></i>
+                        </div>
+                        <span class="text-xs font-extrabold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full">Langkah 2</span>
+                        <h3 class="font-title text-2xl font-bold text-slate-800 mt-2">Panduan Penggunaan</h3>
+                        <p class="text-slate-600 text-sm mt-1 font-semibold">
+                            Cara menggunakan aplikasi dan cara mengendalikan pesawat tempur kata.
+                        </p>
+                    </div>
+                    <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-purple-600 font-extrabold text-sm">
+                        <span>Lihat Panduan</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+
+                <!-- Card 3: Materi Inti -->
+                <div onclick="navigateTo('materi')" class="cursor-pointer group bg-white rounded-3xl p-6 shadow-xl border-4 border-sky-200 hover:border-sky-500 transition-all hover:-translate-y-1 flex flex-col justify-between">
+                    <div>
+                        <div class="w-16 h-16 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform shadow-sm">
+                            <i class="fa-solid fa-book-open-reader"></i>
+                        </div>
+                        <span class="text-xs font-extrabold uppercase tracking-wider text-sky-600 bg-sky-50 px-3 py-1 rounded-full">Langkah 3</span>
+                        <h3 class="font-title text-2xl font-bold text-slate-800 mt-2">Materi Inti</h3>
+                        <p class="text-slate-600 text-sm mt-1 font-semibold">
+                            Belajar tentang Kalimat Ajakan: kata Ayo, Mari, Yuk, dan contohnya!
+                        </p>
+                    </div>
+                    <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-sky-600 font-extrabold text-sm">
+                        <span>Pelajari Materi</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+
+                <!-- Card 4: Game Pesawat Tembak-Tembak -->
+                <div onclick="navigateTo('game')" class="cursor-pointer group bg-gradient-to-br from-amber-50 to-orange-100 rounded-3xl p-6 shadow-xl border-4 border-amber-400 hover:border-orange-500 transition-all hover:-translate-y-1 flex flex-col justify-between">
+                    <div>
+                        <div class="w-16 h-16 rounded-2xl bg-orange-500 text-white flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform shadow-md">
+                            <i class="fa-solid fa-jet-fighter-up"></i>
+                        </div>
+                        <span class="text-xs font-extrabold uppercase tracking-wider text-orange-800 bg-orange-200 px-3 py-1 rounded-full">Langkah 4 • Seru!</span>
+                        <h3 class="font-title text-2xl font-bold text-slate-900 mt-2">Game Pesawat Kata</h3>
+                        <p class="text-slate-700 text-sm mt-1 font-semibold">
+                            Terbangkan pesawatmu dan tembak balon target yang berisi Kalimat Ajakan!
+                        </p>
+                    </div>
+                    <div class="mt-5 pt-3 border-t border-orange-200 flex items-center justify-between text-orange-700 font-extrabold text-sm">
+                        <span>Mulai Terbang & Tembak</span>
+                        <i class="fa-solid fa-play group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+
+                <!-- Card 5: Evaluasi -->
+                <div onclick="navigateTo('evaluasi')" class="cursor-pointer group bg-white rounded-3xl p-6 shadow-xl border-4 border-sky-200 hover:border-emerald-400 transition-all hover:-translate-y-1 flex flex-col justify-between">
+                    <div>
+                        <div class="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform shadow-sm">
+                            <i class="fa-solid fa-clipboard-check"></i>
+                        </div>
+                        <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">Langkah 5</span>
+                        <h3 class="font-title text-2xl font-bold text-slate-800 mt-2">Evaluasi (Kuis)</h3>
+                        <p class="text-slate-600 text-sm mt-1 font-semibold">
+                            Uji pemahamanmu lewat soal latihan pilihan ganda yang seru.
+                        </p>
+                    </div>
+                    <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-emerald-600 font-extrabold text-sm">
+                        <span>Kerjakan Evaluasi</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+
+                <!-- Card 6: Umpan Balik -->
+                <div onclick="navigateTo('umpanbalik')" class="cursor-pointer group bg-white rounded-3xl p-6 shadow-xl border-4 border-sky-200 hover:border-pink-400 transition-all hover:-translate-y-1 flex flex-col justify-between">
+                    <div>
+                        <div class="w-16 h-16 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform shadow-sm">
+                            <i class="fa-solid fa-medal"></i>
+                        </div>
+                        <span class="text-xs font-extrabold uppercase tracking-wider text-pink-600 bg-pink-50 px-3 py-1 rounded-full">Langkah 6</span>
+                        <h3 class="font-title text-2xl font-bold text-slate-800 mt-2">Umpan Balik & Rapor</h3>
+                        <p class="text-slate-600 text-sm mt-1 font-semibold">
+                            Lihat perolehan bintangmu, nilai akhir, dan berikan refleksi perasaanmu!
+                        </p>
+                    </div>
+                    <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-pink-600 font-extrabold text-sm">
+                        <span>Lihat Hasil & Umpan Balik</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             3. TUJUAN PEMBELAJARAN
+             ========================================== -->
+        <section id="view-tujuan" class="hidden">
+            <div class="bg-white/95 rounded-[2.5rem] p-6 sm:p-10 shadow-2xl border-4 border-amber-300 max-w-4xl mx-auto">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-16 h-16 rounded-2xl bg-amber-400 text-amber-950 flex items-center justify-center text-3xl shadow-md shrink-0">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-extrabold uppercase tracking-wider text-amber-600">Kurikulum Merdeka • Kelas 2 Fase A</span>
+                        <h2 class="font-title text-3xl sm:text-4xl font-bold text-slate-800">Tujuan Pembelajaran</h2>
+                    </div>
+                </div>
+
+                <!-- Main Objective Highlight Box -->
+                <div class="bg-gradient-to-r from-amber-100 to-yellow-50 border-4 border-amber-400 rounded-3xl p-6 sm:p-8 mb-8 text-center shadow-inner">
+                    <span class="inline-block bg-amber-400 text-amber-950 font-title font-bold px-4 py-1 rounded-full text-sm mb-3">
+                        ⭐ TUJUAN UTAMA ⭐
+                    </span>
+                    <p class="font-title text-2xl sm:text-3xl font-bold text-slate-900 leading-snug">
+                        "Murid dapat mengetahui tentang kalimat ajakan."
+                    </p>
+                </div>
+
+                <!-- Detailed Sub-Indicators for Grade 2 -->
+                <h3 class="font-title text-xl font-bold text-slate-700 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-sky-500"></i>
+                    <span>Setelah belajar dan bermain di pesawat kata ini, kamu diharapkan bisa:</span>
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div class="bg-sky-50 border-2 border-sky-200 rounded-2xl p-5 flex flex-col items-center text-center">
+                        <div class="w-12 h-12 rounded-full bg-sky-500 text-white font-title font-bold text-xl flex items-center justify-center mb-3">1</div>
+                        <h4 class="font-title font-bold text-lg text-sky-900 mb-1">Mengenal Ciri-Ciri</h4>
+                        <p class="text-slate-600 text-sm font-semibold">
+                            Mengetahui kata khusus kalimat ajakan yaitu <strong>"Ayo"</strong>, <strong>"Mari"</strong>, dan <strong>"Yuk"</strong> serta tanda seru <strong>(!)</strong>.
+                        </p>
+                    </div>
+                    <div class="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-5 flex flex-col items-center text-center">
+                        <div class="w-12 h-12 rounded-full bg-emerald-500 text-white font-title font-bold text-xl flex items-center justify-center mb-3">2</div>
+                        <h4 class="font-title font-bold text-lg text-emerald-900 mb-1">Membedakan Kalimat</h4>
+                        <p class="text-slate-600 text-sm font-semibold">
+                            Membedakan mana yang merupakan <strong>Kalimat Ajakan</strong> dan mana yang bukan (seperti kalimat tanya atau larangan).
+                        </p>
+                    </div>
+                    <div class="bg-purple-50 border-2 border-purple-200 rounded-2xl p-5 flex flex-col items-center text-center">
+                        <div class="w-12 h-12 rounded-full bg-purple-500 text-white font-title font-bold text-xl flex items-center justify-center mb-3">3</div>
+                        <h4 class="font-title font-bold text-lg text-purple-900 mb-1">Mengajak dengan Sopan</h4>
+                        <p class="text-slate-600 text-sm font-semibold">
+                            Menggunakan kalimat ajakan yang ramah dan sopan kepada teman, guru, dan keluarga.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap justify-between items-center gap-4 pt-4 border-t border-slate-200">
+                    <button onclick="navigateTo('menu')" class="btn-kid bg-slate-200 text-slate-700 px-6 py-3 rounded-2xl font-title font-bold">
+                        <i class="fa-solid fa-arrow-left mr-2"></i> Kembali ke Menu
+                    </button>
+                    <button onclick="navigateTo('panduan')" class="btn-kid btn-kid-blue px-6 py-3 rounded-2xl font-title font-bold">
+                        Lanjut ke Panduan <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             4. PANDUAN PENGGUNAAN
+             ========================================== -->
+        <section id="view-panduan" class="hidden">
+            <div class="bg-white/95 rounded-[2.5rem] p-6 sm:p-10 shadow-2xl border-4 border-purple-300 max-w-4xl mx-auto">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-16 h-16 rounded-2xl bg-purple-500 text-white flex items-center justify-center text-3xl shadow-md shrink-0">
+                        <i class="fa-solid fa-compass"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-extrabold uppercase tracking-wider text-purple-600">Petunjuk Pilot Cilik</span>
+                        <h2 class="font-title text-3xl sm:text-4xl font-bold text-slate-800">Panduan Penggunaan</h2>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <!-- How to use the app -->
+                    <div class="bg-purple-50 border-2 border-purple-200 rounded-3xl p-6 space-y-4">
+                        <h3 class="font-title text-xl font-bold text-purple-900 flex items-center gap-2">
+                            <i class="fa-solid fa-map-signs text-purple-600"></i>
+                            <span>Cara Belajar di Aplikasi:</span>
+                        </h3>
+                        <ul class="space-y-3 text-sm sm:text-base font-semibold text-slate-700">
+                            <li class="flex items-start gap-3">
+                                <span class="w-7 h-7 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+                                <span>Baca <strong>Materi Inti</strong> terlebih dahulu supaya kamu kenal ciri-ciri Kalimat Ajakan.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-7 h-7 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+                                <span>Mainkan <strong>Game Pesawat Kata</strong>. Tembak balon udara yang membawa <strong>Kalimat Ajakan</strong>!</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-7 h-7 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+                                <span>Kerjakan <strong>Evaluasi</strong> sebanyak 6 soal pilihan ganda dengan teliti.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-7 h-7 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
+                                <span>Buka halaman <strong>Umpan Balik</strong> untuk melihat bintang dan sertifikat pilotmu!</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- How to play the game -->
+                    <div class="bg-sky-50 border-2 border-sky-200 rounded-3xl p-6 space-y-4">
+                        <h3 class="font-title text-xl font-bold text-sky-900 flex items-center gap-2">
+                            <i class="fa-solid fa-gamepad text-sky-600"></i>
+                            <span>Cara Mengendalikan Pesawat:</span>
+                        </h3>
+                        <div class="space-y-3 text-sm sm:text-base font-semibold text-slate-700">
+                            <div class="bg-white p-3.5 rounded-2xl border border-sky-200 flex items-center gap-3">
+                                <div class="flex gap-1 shrink-0">
+                                    <span class="px-2.5 py-1.5 bg-slate-200 rounded-lg font-mono font-bold text-xs border-b-2 border-slate-400">⬅️</span>
+                                    <span class="px-2.5 py-1.5 bg-slate-200 rounded-lg font-mono font-bold text-xs border-b-2 border-slate-400">➡️</span>
+                                </div>
+                                <span>Gunakan tombol <strong>Panah Kiri / Kanan</strong> di keyboard atau tombol layar untuk menggerakkan pesawat.</span>
+                            </div>
+
+                            <div class="bg-white p-3.5 rounded-2xl border border-sky-200 flex items-center gap-3">
+                                <span class="px-3 py-1.5 bg-red-500 text-white rounded-lg font-title font-bold text-xs border-b-2 border-red-700 shrink-0">SPASI / TEMBAK</span>
+                                <span>Tekan <strong>Spasi (Spacebar)</strong> atau tombol merah <strong>TEMBAK!</strong> untuk menembakkan peluru bintang.</span>
+                            </div>
+
+                            <div class="bg-emerald-100 border border-emerald-300 p-3.5 rounded-2xl text-emerald-950 text-xs sm:text-sm">
+                                <p class="font-extrabold">🎯 ATURAN SKOR GAME:</p>
+                                <p class="mt-1">✅ Tembak <strong>Kalimat Ajakan</strong> (Ayo, Mari, Yuk) = <strong>+20 Poin!</strong></p>
+                                <p>❌ Jangan tembak kalimat yang BUKAN kalimat ajakan = <strong>Nyawa berkurang 1 ❤️</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap justify-between items-center gap-4 pt-4 border-t border-slate-200">
+                    <button onclick="navigateTo('tujuan')" class="btn-kid bg-slate-200 text-slate-700 px-6 py-3 rounded-2xl font-title font-bold">
+                        <i class="fa-solid fa-arrow-left mr-2"></i> Tujuan
+                    </button>
+                    <button onclick="navigateTo('materi')" class="btn-kid btn-kid-green px-6 py-3 rounded-2xl font-title font-bold">
+                        Mulai Belajar Materi Inti <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             5. MATERI INTI (INTERACTIVE SLIDES)
+             ========================================== -->
+        <section id="view-materi" class="hidden">
+            <div class="bg-white/95 rounded-[2.5rem] p-6 sm:p-10 shadow-2xl border-4 border-sky-400 max-w-4xl mx-auto">
+                <!-- Header + Slide Indicator -->
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-14 h-14 rounded-2xl bg-sky-500 text-white flex items-center justify-center text-2xl shadow-md">
+                            <i class="fa-solid fa-book-open-reader"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-extrabold uppercase tracking-wider text-sky-600">Materi Bahasa Indonesia Kelas 2</span>
+                            <h2 class="font-title text-2xl sm:text-3xl font-bold text-slate-800">Mengenal Kalimat Ajakan</h2>
+                        </div>
+                    </div>
+                    <!-- Slide Dots -->
+                    <div class="flex items-center gap-2">
+                        <button onclick="setMateriSlide(0)" id="matDot0" class="w-10 h-10 rounded-xl font-title font-bold bg-sky-500 text-white">1</button>
+                        <button onclick="setMateriSlide(1)" id="matDot1" class="w-10 h-10 rounded-xl font-title font-bold bg-sky-100 text-sky-700">2</button>
+                        <button onclick="setMateriSlide(2)" id="matDot2" class="w-10 h-10 rounded-xl font-title font-bold bg-sky-100 text-sky-700">3</button>
+                    </div>
+                </div>
+
+                <!-- SLIDE 1: Pengertian Kalimat Ajakan -->
+                <div id="materiSlide0" class="space-y-6">
+                    <div class="bg-sky-50 border-3 border-sky-200 rounded-3xl p-6 sm:p-8">
+                        <span class="inline-block bg-sky-600 text-white font-title font-bold px-4 py-1 rounded-full text-sm mb-3">
+                            Bagian 1 dari 3 • Apa itu Kalimat Ajakan?
+                        </span>
+                        <h3 class="font-title text-2xl sm:text-3xl font-bold text-sky-950 mb-3">
+                            Pengertian Kalimat Ajakan 🤝
+                        </h3>
+                        <p class="text-lg sm:text-xl text-slate-700 font-semibold leading-relaxed">
+                            <strong class="text-sky-700">Kalimat Ajakan</strong> adalah kalimat yang digunakan untuk <strong>meminta atau mengajak orang lain</strong> melakukan suatu kegiatan bersama-sama dengan sopan.
+                        </p>
+
+                        <!-- Visual Dialogue Example -->
+                        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-white p-4 rounded-2xl border-2 border-sky-200 shadow-sm flex items-start gap-3">
+                                <div class="text-4xl">👦</div>
+                                <div>
+                                    <p class="text-xs font-extrabold text-sky-600 uppercase">Raka berkata:</p>
+                                    <p class="font-title font-bold text-lg text-slate-800 mt-1">"Siti, <u>ayo</u> kita membaca buku cerita di perpustakaan!"</p>
+                                </div>
+                            </div>
+                            <div class="bg-white p-4 rounded-2xl border-2 border-emerald-200 shadow-sm flex items-start gap-3">
+                                <div class="text-4xl">👧</div>
+                                <div>
+                                    <p class="text-xs font-extrabold text-emerald-600 uppercase">Siti menjawab:</p>
+                                    <p class="font-title font-bold text-lg text-slate-800 mt-1">"Wah, ide bagus Raka! <u>Yuk</u>, kita ke sana sekarang!"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 2: Ciri-Ciri Kalimat Ajakan -->
+                <div id="materiSlide1" class="hidden space-y-6">
+                    <div class="bg-amber-50 border-3 border-amber-200 rounded-3xl p-6 sm:p-8">
+                        <span class="inline-block bg-amber-500 text-amber-950 font-title font-bold px-4 py-1 rounded-full text-sm mb-3">
+                            Bagian 2 dari 3 • Ciri-Ciri Kalimat Ajakan
+                        </span>
+                        <h3 class="font-title text-2xl sm:text-3xl font-bold text-amber-950 mb-4">
+                            3 Kata Kunci Kalimat Ajakan 🔑
+                        </h3>
+                        <p class="text-slate-700 font-semibold text-base sm:text-lg mb-5">
+                            Kalimat ajakan sangat mudah dikenali! Biasanya diawali dengan salah satu dari <strong>3 kata ajakan</strong> berikut ini dan diakhiri dengan <strong>tanda seru (!)</strong>:
+                        </p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-white border-3 border-amber-400 rounded-2xl p-5 text-center shadow-sm">
+                                <span class="inline-block bg-amber-400 text-amber-950 font-title font-bold text-2xl px-5 py-1.5 rounded-2xl mb-3">1. AYO</span>
+                                <p class="font-bold text-slate-800 text-base">"<span class="text-red-600 underline">Ayo</span>, kita senam pagi bersama<span class="text-red-600 font-extrabold">!</span>"</p>
+                            </div>
+                            <div class="bg-white border-3 border-sky-400 rounded-2xl p-5 text-center shadow-sm">
+                                <span class="inline-block bg-sky-400 text-white font-title font-bold text-2xl px-5 py-1.5 rounded-2xl mb-3">2. MARI</span>
+                                <p class="font-bold text-slate-800 text-base">"<span class="text-sky-600 underline">Mari</span>, kita menjaga kebersihan kelas<span class="text-sky-600 font-extrabold">!</span>"</p>
+                            </div>
+                            <div class="bg-white border-3 border-emerald-400 rounded-2xl p-5 text-center shadow-sm">
+                                <span class="inline-block bg-emerald-500 text-white font-title font-bold text-2xl px-5 py-1.5 rounded-2xl mb-3">3. YUK</span>
+                                <p class="font-bold text-slate-800 text-base">"<span class="text-emerald-600 underline">Yuk</span>, kita merapikan mainan ini<span class="text-emerald-600 font-extrabold">!</span>"</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 bg-white/80 rounded-2xl p-4 border-2 border-amber-300 flex items-center gap-3 text-sm sm:text-base font-bold text-amber-900">
+                            <i class="fa-solid fa-lightbulb text-2xl text-amber-500 shrink-0"></i>
+                            <span>Ingat ya: Ucapkan kalimat ajakan dengan nada suara yang <strong>ramah dan sopan</strong> agar teman senang diajak!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 3: Membedakan Kalimat Ajakan vs Bukan -->
+                <div id="materiSlide2" class="hidden space-y-6">
+                    <div class="bg-emerald-50 border-3 border-emerald-200 rounded-3xl p-6 sm:p-8">
+                        <span class="inline-block bg-emerald-600 text-white font-title font-bold px-4 py-1 rounded-full text-sm mb-3">
+                            Bagian 3 dari 3 • Contoh & Perbandingan
+                        </span>
+                        <h3 class="font-title text-2xl sm:text-3xl font-bold text-emerald-950 mb-4">
+                            Mana Kalimat Ajakan & Mana yang Bukan? 🤔
+                        </h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <!-- Correct Examples -->
+                            <div class="bg-white rounded-2xl p-5 border-3 border-emerald-400 shadow-sm">
+                                <h4 class="font-title font-bold text-lg text-emerald-700 flex items-center gap-2 mb-3">
+                                    <i class="fa-solid fa-circle-check text-xl"></i>
+                                    <span>CONTOH KALIMAT AJAKAN (TEMBAK INI!)</span>
+                                </h4>
+                                <ul class="space-y-2.5 text-sm sm:text-base font-bold text-slate-700">
+                                    <li class="p-2.5 bg-emerald-50 rounded-xl">✅ "<strong>Ayo</strong>, kita mencuci tangan sebelum makan!"</li>
+                                    <li class="p-2.5 bg-emerald-50 rounded-xl">✅ "<strong>Mari</strong> belajar kelompok di rumahku!"</li>
+                                    <li class="p-2.5 bg-emerald-50 rounded-xl">✅ "<strong>Yuk</strong>, kita bermain sepak bola di lapangan!"</li>
+                                    <li class="p-2.5 bg-emerald-50 rounded-xl">✅ "<strong>Ayo</strong>, buang sampah di tempat sampah!"</li>
+                                </ul>
+                            </div>
+
+                            <!-- Non-Invitation Examples -->
+                            <div class="bg-white rounded-2xl p-5 border-3 border-rose-400 shadow-sm">
+                                <h4 class="font-title font-bold text-lg text-rose-700 flex items-center gap-2 mb-3">
+                                    <i class="fa-solid fa-circle-xmark text-xl"></i>
+                                    <span>BUKAN KALIMAT AJAKAN (JANGAN DITEMBAK!)</span>
+                                </h4>
+                                <ul class="space-y-2.5 text-sm sm:text-base font-bold text-slate-700">
+                                    <li class="p-2.5 bg-rose-50 rounded-xl">❌ "Siapa nama guru kelasmu?" <span class="text-xs text-rose-600 block">(Ini Kalimat Tanya)</span></li>
+                                    <li class="p-2.5 bg-rose-50 rounded-xl">❌ "Dilarang menginjak rumput!" <span class="text-xs text-rose-600 block">(Ini Kalimat Larangan)</span></li>
+                                    <li class="p-2.5 bg-rose-50 rounded-xl">❌ "Ibu sedang memasak di dapur." <span class="text-xs text-rose-600 block">(Ini Kalimat Berita)</span></li>
+                                    <li class="p-2.5 bg-rose-50 rounded-xl">❌ "Di mana letak tas sekolahmu?" <span class="text-xs text-rose-600 block">(Ini Kalimat Tanya)</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide Navigation Footer -->
+                <div class="flex flex-wrap justify-between items-center gap-4 mt-8 pt-4 border-t border-slate-200">
+                    <button onclick="prevMateriSlide()" id="btnPrevMateri" class="btn-kid bg-slate-200 text-slate-700 px-5 py-3 rounded-2xl font-title font-bold">
+                        <i class="fa-solid fa-arrow-left mr-2"></i> Sebelumnya
+                    </button>
+                    <button onclick="nextMateriSlide()" id="btnNextMateri" class="btn-kid btn-kid-blue px-6 py-3 rounded-2xl font-title font-bold">
+                        Selanjutnya <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             6. GAME PESAWAT TERBANG TEMBAK-TEMBAK
+             ========================================== -->
+        <section id="view-game" class="hidden">
+            <div class="bg-white/95 rounded-[2rem] p-3 sm:p-5 shadow-2xl border-4 border-amber-400 max-w-5xl mx-auto">
+                <!-- Game Top HUD Bar -->
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3 bg-sky-900 text-white px-4 py-2.5 rounded-2xl">
+                    <div class="flex items-center gap-3">
+                        <span class="font-title font-bold text-amber-300 text-base sm:text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-crosshairs"></i>
+                            <span>MISI: Tembak Balon KALIMAT AJAKAN (Ayo, Mari, Yuk)!</span>
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-4 ml-auto">
+                        <div class="font-title font-bold text-base sm:text-lg text-amber-300">
+                            Skor: <span id="gameScoreDisplay">0</span>
+                        </div>
+                        <div class="font-title font-bold text-base sm:text-lg text-rose-400 flex items-center gap-1" id="gameLivesDisplay">
+                            ❤️❤️❤️
+                        </div>
+                        <button onclick="stopGameAndExit()" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl">
+                            Keluar Game
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Canvas Container -->
+                <div class="relative w-full h-[380px] sm:h-[440px] rounded-2xl overflow-hidden border-4 border-sky-300 shadow-inner">
+                    <canvas id="gameCanvas"></canvas>
+
+                    <!-- Start / Game Over Overlay inside Canvas -->
+                    <div id="gameOverlay" class="absolute inset-0 bg-sky-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center text-white z-10">
+                        <div class="w-20 h-20 rounded-3xl bg-amber-400 text-amber-950 flex items-center justify-center text-4xl mb-3 shadow-lg plane-bounce">
+                            <i class="fa-solid fa-plane-up"></i>
+                        </div>
+                        <h3 id="overlayTitle" class="font-title text-2xl sm:text-4xl font-bold text-amber-300 mb-2">
+                            Siap Terbang, Kapten?
+                        </h3>
+                        <p id="overlayDesc" class="max-w-md text-sky-100 font-semibold text-sm sm:text-base mb-6">
+                            Arahkan pesawatmu dan <strong>TEMBAK</strong> balon udara yang membawa <strong>Kalimat Ajakan (Ayo, Mari, Yuk)</strong>! Hindari menembak kalimat yang salah ya!
+                        </p>
+                        <div class="flex flex-wrap justify-center gap-4">
+                            <button onclick="startShooterGame()" class="btn-kid btn-kid-green px-8 py-3.5 rounded-2xl font-title font-bold text-xl flex items-center gap-2">
+                                <i class="fa-solid fa-play"></i>
+                                <span id="overlayBtnText">MULAI TERBANG!</span>
+                            </button>
+                            <button onclick="navigateTo('evaluasi')" class="btn-kid btn-kid-yellow px-6 py-3.5 rounded-2xl font-title font-bold text-lg flex items-center gap-2">
+                                <i class="fa-solid fa-clipboard-check"></i>
+                                <span>Lanjut ke Evaluasi</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- On-Screen Touch & Mouse Controls (Placed cleanly outside canvas at bottom center) -->
+                <div class="mt-4 flex flex-wrap items-center justify-between gap-3 bg-sky-50 p-3 rounded-2xl border-2 border-sky-200">
+                    <!-- Left / Right Move Buttons -->
+                    <div class="flex items-center gap-3">
+                        <button id="btnMoveLeft"
+                            class="btn-kid btn-kid-blue w-16 h-14 sm:w-20 sm:h-14 rounded-2xl font-title font-bold text-2xl flex items-center justify-center active:scale-95"
+                            aria-label="Gerak Kiri">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <button id="btnMoveRight"
+                            class="btn-kid btn-kid-blue w-16 h-14 sm:w-20 sm:h-14 rounded-2xl font-title font-bold text-2xl flex items-center justify-center active:scale-95"
+                            aria-label="Gerak Kanan">
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="hidden md:block text-center text-xs font-extrabold text-sky-800">
+                        💡 Tips: Bisa pakai tombol <strong>Panah Kiri/Kanan</strong> & <strong>Spasi</strong> di Keyboard, atau tekan tombol di layar ini!
+                    </div>
+
+                    <!-- Shoot Button -->
+                    <button id="btnShoot" onclick="playerShoot()"
+                        class="btn-kid btn-kid-red px-7 h-14 rounded-2xl font-title font-bold text-xl flex items-center gap-2 active:scale-95">
+                        <i class="fa-solid fa-burst"></i>
+                        <span>TEMBAK!</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             7. EVALUASI (INTERACTIVE QUIZ)
+             ========================================== -->
+        <section id="view-evaluasi" class="hidden">
+            <div class="bg-white/95 rounded-[2.5rem] p-6 sm:p-10 shadow-2xl border-4 border-emerald-400 max-w-3xl mx-auto">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-2xl shadow-md">
+                            <i class="fa-solid fa-clipboard-check"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-600">Uji Pemahaman Murid</span>
+                            <h2 class="font-title text-2xl sm:text-3xl font-bold text-slate-800">Evaluasi Kalimat Ajakan</h2>
+                        </div>
+                    </div>
+                    <div class="bg-emerald-100 text-emerald-900 font-title font-bold px-4 py-2 rounded-2xl text-sm">
+                        Soal <span id="quizCurrentNum">1</span> / <span id="quizTotalNum">6</span>
+                    </div>
+                </div>
+
+                <!-- Quiz Question Container -->
+                <div id="quizContainer" class="space-y-6">
+                    <div class="bg-sky-50 border-3 border-sky-200 rounded-3xl p-6">
+                        <p id="quizQuestionText" class="font-title text-xl sm:text-2xl font-bold text-slate-800 leading-snug">
+                            Pertanyaan akan muncul di sini...
+                        </p>
+                    </div>
+
+                    <!-- Options Grid -->
+                    <div id="quizOptionsList" class="grid grid-cols-1 gap-3.5">
+                        <!-- Dynamically populated options -->
+                    </div>
+
+                    <!-- Instant Explanation Box -->
+                    <div id="quizFeedbackBox" class="hidden rounded-2xl p-4 border-2 font-bold text-sm sm:text-base"></div>
+
+                    <div class="flex justify-end pt-2">
+                        <button id="btnNextQuestion" onclick="nextQuizQuestion()" class="hidden btn-kid btn-kid-blue px-7 py-3 rounded-2xl font-title font-bold text-lg">
+                            Soal Berikutnya <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quiz Completed Summary View -->
+                <div id="quizResultBox" class="hidden text-center py-6 space-y-5">
+                    <div class="w-24 h-24 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-5xl mx-auto shadow-inner">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <h3 class="font-title text-3xl font-bold text-slate-800">Evaluasi Selesai! 🎉</h3>
+                    <p class="text-slate-600 font-semibold text-lg">
+                        Nilai Evaluasi Kamu: <span id="quizFinalScoreText" class="font-title font-bold text-3xl text-emerald-600">100</span>
+                    </p>
+                    <div class="flex flex-wrap justify-center gap-4 pt-2">
+                        <button onclick="resetQuiz()" class="btn-kid bg-slate-200 text-slate-700 px-6 py-3 rounded-2xl font-title font-bold">
+                            <i class="fa-solid fa-rotate-right mr-2"></i> Ulangi Evaluasi
+                        </button>
+                        <button onclick="navigateTo('umpanbalik')" class="btn-kid btn-kid-green px-8 py-3 rounded-2xl font-title font-bold text-lg">
+                            Lihat Rapor & Umpan Balik <i class="fa-solid fa-medal ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             8. UMPAN BALIK & RAPOR BINTANG
+             ========================================== -->
+        <section id="view-umpanbalik" class="hidden">
+            <div class="bg-white/95 rounded-[2.5rem] p-6 sm:p-10 shadow-2xl border-4 border-pink-400 max-w-4xl mx-auto">
+                <div class="text-center mb-8">
+                    <span class="inline-block bg-pink-100 text-pink-700 font-extrabold px-4 py-1 rounded-full text-xs uppercase tracking-wider mb-2">
+                        Sertifikat & Refleksi Belajar
+                    </span>
+                    <h2 class="font-title text-3xl sm:text-4xl font-bold text-slate-800">Umpan Balik Pilot Hebat</h2>
+                </div>
+
+                <!-- Student Report Card -->
+                <div class="bg-gradient-to-br from-amber-50 via-white to-sky-50 border-4 border-amber-400 rounded-3xl p-6 sm:p-8 shadow-lg mb-8">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b-2 border-dashed border-amber-300">
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 rounded-2xl bg-amber-400 text-amber-950 flex items-center justify-center text-3xl font-bold shadow">
+                                <i class="fa-solid fa-award"></i>
+                            </div>
+                            <div class="text-center sm:text-left">
+                                <p class="text-xs font-extrabold uppercase text-amber-700">Pilot Bahasa Indonesia Kelas 2 Fase A</p>
+                                <h3 id="fbStudentName" class="font-title text-2xl sm:text-3xl font-bold text-slate-900">Nama Murid</h3>
+                                <p id="fbStudentClass" class="font-bold text-sky-700">Kelas 2A</p>
+                            </div>
+                        </div>
+
+                        <!-- Star Rating -->
+                        <div class="text-center">
+                            <div id="fbStars" class="text-3xl sm:text-4xl text-amber-400 tracking-widest drop-shadow">
+                                ⭐⭐⭐⭐⭐
+                            </div>
+                            <span id="fbBadgeTitle" class="inline-block mt-1 bg-amber-400 text-amber-950 font-title font-bold text-xs px-3 py-1 rounded-full">
+                                Pilot Bintang Utama!
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Score Breakdown -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
+                        <div class="bg-white p-4 rounded-2xl border-2 border-sky-200 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-jet-fighter text-2xl text-sky-500"></i>
+                                <span class="font-bold text-slate-700">Skor Tertinggi Game Pesawat:</span>
+                            </div>
+                            <span id="fbGameScore" class="font-title font-bold text-2xl text-sky-600">0</span>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border-2 border-emerald-200 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-clipboard-check text-2xl text-emerald-500"></i>
+                                <span class="font-bold text-slate-700">Nilai Evaluasi Kuis:</span>
+                            </div>
+                            <span id="fbQuizScore" class="font-title font-bold text-2xl text-emerald-600">0 / 100</span>
+                        </div>
+                    </div>
+
+                    <!-- Personalized Teacher Feedback Message -->
+                    <div class="bg-sky-100/80 border-2 border-sky-300 rounded-2xl p-4 text-center">
+                        <p class="font-title font-bold text-sky-950 text-lg" id="fbMessage">
+                            "Hebat sekali! Kamu sudah pintar mengetahui ciri-ciri Kalimat Ajakan seperti Ayo, Mari, dan Yuk!"
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Interactive Student Reflection (Umpan Balik Perasaan Murid) -->
+                <div class="bg-pink-50 border-3 border-pink-200 rounded-3xl p-6 text-center mb-8">
+                    <h4 class="font-title text-xl font-bold text-pink-950 mb-2">
+                        Bagaimana perasaanmu belajar Kalimat Ajakan hari ini? 😊
+                    </h4>
+                    <p class="text-sm font-semibold text-slate-600 mb-4">Klik salah satu gambar wajah di bawah ini ya!</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-xl mx-auto">
+                        <button onclick="selectFeeling('Sangat Senang 🤩')" id="feelBtn1" class="feel-btn bg-white hover:bg-amber-50 border-3 border-pink-200 rounded-2xl p-4 transition-all flex flex-col items-center gap-1">
+                            <span class="text-4xl">🤩</span>
+                            <span class="font-title font-bold text-slate-800">Sangat Senang!</span>
+                        </button>
+                        <button onclick="selectFeeling('Senang 😊')" id="feelBtn2" class="feel-btn bg-white hover:bg-amber-50 border-3 border-pink-200 rounded-2xl p-4 transition-all flex flex-col items-center gap-1">
+                            <span class="text-4xl">😊</span>
+                            <span class="font-title font-bold text-slate-800">Senang & Paham</span>
+                        </button>
+                        <button onclick="selectFeeling('Ingin Latihan Lagi 💪')" id="feelBtn3" class="feel-btn bg-white hover:bg-amber-50 border-3 border-pink-200 rounded-2xl p-4 transition-all flex flex-col items-center gap-1">
+                            <span class="text-4xl">💪</span>
+                            <span class="font-title font-bold text-slate-800">Ingin Latihan Lagi</span>
+                        </button>
+                    </div>
+
+                    <p id="feelingSavedText" class="hidden mt-4 font-title font-bold text-emerald-700 bg-emerald-100 inline-block px-4 py-1.5 rounded-full text-sm">
+                        ✨ Terima kasih! Umpan balik perasaanmu sudah tersimpan.
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap justify-between items-center gap-4">
+                    <button onclick="navigateTo('menu')" class="btn-kid btn-kid-blue px-6 py-3 rounded-2xl font-title font-bold">
+                        <i class="fa-solid fa-house mr-2"></i> Kembali ke Menu Utama
+                    </button>
+                    <button onclick="navigateTo('game')" class="btn-kid btn-kid-yellow px-6 py-3 rounded-2xl font-title font-bold">
+                        <i class="fa-solid fa-rotate-right mr-2"></i> Main Game Lagi
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==========================================
+         JAVASCRIPT LOGIC (SOUND, NAVIGATION, GAME, QUIZ)
+         ========================================== -->
+    <script>
+        /* -----------------------------------------------------------
+         * 1. GLOBAL STATE & STUDENT DATA
+         * ----------------------------------------------------------- */
+        const appState = {
+            studentName: '',
+            studentClass: '',
+            soundEnabled: true,
+            materiSlideIndex: 0,
+            highScoreGame: 0,
+            quizScore: 0,
+            quizCompleted: false,
+            studentFeeling: ''
+        };
+
+        /* -----------------------------------------------------------
+         * 2. WEB AUDIO API SYNTHESIZER (Kid-friendly effects, no external URLs)
+         * ----------------------------------------------------------- */
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) audioCtx = new AudioContext();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (!appState.soundEnabled) return;
+            try {
+                initAudio();
+                if (!audioCtx) return;
+
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(520, now);
+                    osc.frequency.exponentialRampToValueAtTime(680, now + 0.08);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                } else if (type === 'shoot') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(780, now);
+                    osc.frequency.exponentialRampToValueAtTime(220, now + 0.14);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.14);
+                    osc.start(now);
+                    osc.stop(now + 0.14);
+                } else if (type === 'hitGood') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                    gain.gain.setValueAtTime(0.22, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'hitBad') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(200, now);
+                    osc.frequency.linearRampToValueAtTime(120, now + 0.25);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'fanfare') {
+                    const notes = [523.25, 659.25, 783.99, 1046.5];
+                    notes.forEach((freq, idx) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'triangle';
+                        o.frequency.setValueAtTime(freq, now + idx * 0.1);
+                        g.gain.setValueAtTime(0.2, now + idx * 0.1);
+                        g.gain.linearRampToValueAtTime(0.01, now + idx * 0.1 + 0.25);
+                        o.start(now + idx * 0.1);
+                        o.stop(now + idx * 0.1 + 0.25);
+                    });
+                }
+            } catch (e) {
+                // Ignore audio errors on restricted devices
+            }
+        }
+
+        function toggleSound() {
+            appState.soundEnabled = !appState.soundEnabled;
+            const icon = document.getElementById('soundIcon');
+            if (appState.soundEnabled) {
+                icon.className = 'fa-solid fa-volume-high';
+                playSound('click');
+                showToast('Suara efek diaktifkan! 🔊', 'info');
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark';
+                showToast('Suara efek dimatikan 🔇', 'info');
+            }
+        }
+
+        /* -----------------------------------------------------------
+         * 3. CUSTOM TOAST MESSAGE BOX (Replaces window.alert)
+         * ----------------------------------------------------------- */
+        let toastTimer = null;
+        function showToast(message, type = 'warning') {
+            const box = document.getElementById('toastBox');
+            const content = document.getElementById('toastContent');
+            const icon = document.getElementById('toastIcon');
+            const text = document.getElementById('toastText');
+
+            text.textContent = message;
+            if (type === 'warning') {
+                content.className = 'flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border-4 border-white font-bold text-lg bg-amber-400 text-amber-950';
+                icon.className = 'fa-solid fa-triangle-exclamation text-2xl';
+            } else if (type === 'success') {
+                content.className = 'flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border-4 border-white font-bold text-lg bg-emerald-500 text-white';
+                icon.className = 'fa-solid fa-circle-check text-2xl';
+            } else {
+                content.className = 'flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border-4 border-white font-bold text-lg bg-sky-600 text-white';
+                icon.className = 'fa-solid fa-circle-info text-2xl';
+            }
+
+            box.classList.remove('hidden');
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                box.classList.add('hidden');
+            }, 3000);
+        }
+
+        /* -----------------------------------------------------------
+         * 4. LOGIN & VIEW NAVIGATION
+         * ----------------------------------------------------------- */
+        function handleStartApp() {
+            const namaInput = document.getElementById('inputNama').value.trim();
+            const kelasInput = document.getElementById('inputKelas').value.trim();
+
+            if (!namaInput) {
+                playSound('hitBad');
+                showToast('Halo Kapten! Tuliskan Nama Lengkapmu dulu ya! 😊', 'warning');
+                document.getElementById('inputNama').focus();
+                return;
+            }
+            if (!kelasInput) {
+                playSound('hitBad');
+                showToast('Jangan lupa isi Kelasmu ya (contoh: 2A)! 🏫', 'warning');
+                document.getElementById('inputKelas').focus();
+                return;
+            }
+
+            appState.studentName = namaInput;
+            appState.studentClass = kelasInput;
+
+            // Populate Header & Banners
+            document.getElementById('headerStudentName').textContent = appState.studentName;
+            document.getElementById('headerStudentClass').textContent = 'Kelas ' + appState.studentClass.replace(/^kelas\s*/i, '');
+            document.getElementById('welcomeBannerName').textContent = appState.studentName;
+
+            document.getElementById('topHeader').classList.remove('hidden');
+            playSound('fanfare');
+            showToast(`Selamat datang, Kapten ${appState.studentName}! ✈️`, 'success');
+            navigateTo('menu');
+        }
+
+        const allViews = ['login', 'menu', 'tujuan', 'panduan', 'materi', 'game', 'evaluasi', 'umpanbalik'];
+
+        function navigateTo(viewName) {
+            playSound('click');
+
+            // Stop game loop if leaving game view
+            if (viewName !== 'game' && gameState.running) {
+                gameState.running = false;
+            }
+
+            allViews.forEach(v => {
+                const el = document.getElementById('view-' + v);
+                if (el) el.classList.add('hidden');
+            });
+
+            const target = document.getElementById('view-' + viewName);
+            if (target) target.classList.remove('hidden');
+
+            if (viewName === 'materi') {
+                setMateriSlide(0);
+            } else if (viewName === 'game') {
+                resizeGameCanvas();
+                prepareGameIntro();
+            } else if (viewName === 'evaluasi') {
+                if (!appState.quizCompleted && quizState.currentIndex === 0) {
+                    renderQuizQuestion();
+                }
+            } else if (viewName === 'umpanbalik') {
+                updateFeedbackView();
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* -----------------------------------------------------------
+         * 5. MATERI INTI SLIDES
+         * ----------------------------------------------------------- */
+        function setMateriSlide(index) {
+            appState.materiSlideIndex = index;
+            for (let i = 0; i < 3; i++) {
+                const slide = document.getElementById('materiSlide' + i);
+                const dot = document.getElementById('matDot' + i);
+                if (i === index) {
+                    slide.classList.remove('hidden');
+                    dot.className = 'w-10 h-10 rounded-xl font-title font-bold bg-sky-500 text-white shadow';
+                } else {
+                    slide.classList.add('hidden');
+                    dot.className = 'w-10 h-10 rounded-xl font-title font-bold bg-sky-100 text-sky-700';
+                }
+            }
+
+            const prevBtn = document.getElementById('btnPrevMateri');
+            const nextBtn = document.getElementById('btnNextMateri');
+
+            prevBtn.innerHTML = index === 0
+                ? '<i class="fa-solid fa-arrow-left mr-2"></i> Kembali ke Menu'
+                : '<i class="fa-solid fa-arrow-left mr-2"></i> Sebelumnya';
+
+            nextBtn.innerHTML = index === 2
+                ? 'Main Game Pesawat Kata! <i class="fa-solid fa-gamepad ml-2"></i>'
+                : 'Selanjutnya <i class="fa-solid fa-arrow-right ml-2"></i>';
+        }
+
+        function prevMateriSlide() {
+            playSound('click');
+            if (appState.materiSlideIndex > 0) {
+                setMateriSlide(appState.materiSlideIndex - 1);
+            } else {
+                navigateTo('menu');
+            }
+        }
+
+        function nextMateriSlide() {
+            playSound('click');
+            if (appState.materiSlideIndex < 2) {
+                setMateriSlide(appState.materiSlideIndex + 1);
+            } else {
+                navigateTo('game');
+            }
+        }
+
+        /* -----------------------------------------------------------
+         * 6. AIRPLANE SHOOTER GAME (KALIMAT AJAKAN)
+         * ----------------------------------------------------------- */
+        const sentenceBank = [
+            // Kalimat Ajakan (isInvitation: true)
+            { text: "Ayo, kita belajar bersama!", isInvitation: true },
+            { text: "Mari buang sampah di tempatnya!", isInvitation: true },
+            { text: "Yuk, rapikan mainan kita!", isInvitation: true },
+            { text: "Ayo cuci tangan pakai sabun!", isInvitation: true },
+            { text: "Mari membaca buku di perpustakaan!", isInvitation: true },
+            { text: "Yuk, bermain bola di lapangan!", isInvitation: true },
+            { text: "Ayo kita menyiram tanaman!", isInvitation: true },
+            { text: "Mari membantu ibu menyapu!", isInvitation: true },
+            { text: "Yuk, berangkat sekolah bersama!", isInvitation: true },
+            { text: "Ayo, kita senam sehat gembira!", isInvitation: true },
+
+            // Bukan Kalimat Ajakan (isInvitation: false)
+            { text: "Siapa nama teman sebangkumu?", isInvitation: false },
+            { text: "Di mana letak ruang guru?", isInvitation: false },
+            { text: "Jangan berisik di dalam kelas!", isInvitation: false },
+            { text: "Dilarang membuang sampah di sini!", isInvitation: false },
+            { text: "Kapan kita libur sekolah?", isInvitation: false },
+            { text: "Ayah sedang membaca koran.", isInvitation: false },
+            { text: "Berapa jumlah pensil warnamu?", isInvitation: false },
+            { text: "Adik sedang tidur siang.", isInvitation: false }
+        ];
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const gameState = {
+            running: false,
+            score: 0,
+            lives: 3,
+            player: {
+                x: 200,
+                y: 320,
+                width: 74,
+                height: 58,
+                speed: 6.5,
+                moveLeft: false,
+                moveRight: false
+            },
+            bullets: [],
+            targets: [],
+            particles: [],
+            floatingTexts: [],
+            bgClouds: [],
+            spawnTimer: 0,
+            spawnInterval: 115,
+            lastShotTime: 0
+        };
+
+        function resizeGameCanvas() {
+            const container = canvas.parentElement;
+            if (!container) return;
+            canvas.width = container.clientWidth || 800;
+            canvas.height = container.clientHeight || 420;
+            gameState.player.y = canvas.height - 72;
+            if (gameState.player.x > canvas.width - gameState.player.width) {
+                gameState.player.x = canvas.width / 2 - gameState.player.width / 2;
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            if (!document.getElementById('view-game').classList.contains('hidden')) {
+                resizeGameCanvas();
+            }
+        });
+
+        function prepareGameIntro() {
+            const overlay = document.getElementById('gameOverlay');
+            overlay.classList.remove('hidden');
+            document.getElementById('overlayTitle').textContent = 'Siap Terbang, Kapten ' + (appState.studentName || 'Cilik') + '?';
+            document.getElementById('overlayDesc').innerHTML =
+                'Tembak balon udara yang membawa <strong>Kalimat Ajakan (Ayo, Mari, Yuk)</strong> untuk mendapat <strong>+20 Poin</strong>! Jangan tembak kalimat yang salah ya!';
+            document.getElementById('overlayBtnText').textContent = 'MULAI TERBANG!';
+            drawIdleScene();
+        }
+
+        function startShooterGame() {
+            playSound('fanfare');
+            resizeGameCanvas();
+            document.getElementById('gameOverlay').classList.add('hidden');
+
+            gameState.running = true;
+            gameState.score = 0;
+            gameState.lives = 3;
+            gameState.bullets = [];
+            gameState.targets = [];
+            gameState.particles = [];
+            gameState.floatingTexts = [];
+            gameState.spawnTimer = 85;
+            gameState.player.x = canvas.width / 2 - gameState.player.width / 2;
+            gameState.player.y = canvas.height - 72;
+
+            // Initialize decorative background clouds
+            gameState.bgClouds = [
+                { x: 80, y: 60, r: 28, speed: 0.4 },
+                { x: 320, y: 130, r: 36, speed: 0.6 },
+                { x: 600, y: 80, r: 25, speed: 0.35 }
+            ];
+
+            updateGameHUD();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function stopGameAndExit() {
+            gameState.running = false;
+            navigateTo('menu');
+        }
+
+        function updateGameHUD() {
+            document.getElementById('gameScoreDisplay').textContent = gameState.score;
+            document.getElementById('gameLivesDisplay').textContent = '❤️'.repeat(Math.max(0, gameState.lives)) || '💔';
+            if (gameState.score > appState.highScoreGame) {
+                appState.highScoreGame = gameState.score;
+                document.getElementById('headerHighScore').textContent = 'Skor Game: ' + appState.highScoreGame;
+            }
+        }
+
+        function playerShoot() {
+            if (!gameState.running) return;
+            const now = performance.now();
+            if (now - gameState.lastShotTime < 220) return; // Fire rate cooldown
+            gameState.lastShotTime = now;
+
+            playSound('shoot');
+            gameState.bullets.push({
+                x: gameState.player.x + gameState.player.width / 2,
+                y: gameState.player.y - 6,
+                radius: 7,
+                speed: 9
+            });
+        }
+
+        function spawnTargetBalloon() {
+            const item = sentenceBank[Math.floor(Math.random() * sentenceBank.length)];
+            const boxWidth = Math.min(250, Math.max(185, item.text.length * 7.8));
+            const boxHeight = 54;
+            const margin = 16;
+            const maxX = Math.max(margin, canvas.width - boxWidth - margin);
+            const x = margin + Math.random() * (maxX - margin);
+
+            // Balloon colors
+            const colors = ['#fef08a', '#fed7aa', '#e9d5ff', '#bbf7d0', '#fecdd3'];
+            const borderColors = ['#ca8a04', '#ea580c', '#9333ea', '#16a34a', '#e11d48'];
+            const cIdx = Math.floor(Math.random() * colors.length);
+
+            gameState.targets.push({
+                x: x,
+                y: -boxHeight - 20,
+                width: boxWidth,
+                height: boxHeight,
+                speed: 0.95 + Math.random() * 0.55,
+                text: item.text,
+                isInvitation: item.isInvitation,
+                bgColor: colors[cIdx],
+                borderColor: borderColors[cIdx]
+            });
+        }
+
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 16; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 1.5 + Math.random() * 4;
+                gameState.particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    radius: 4 + Math.random() * 4,
+                    color: color,
+                    alpha: 1
+                });
+            }
+        }
+
+        function addFloatingText(text, x, y, color) {
+            gameState.floatingTexts.push({
+                text,
+                x,
+                y,
+                color,
+                alpha: 1,
+                vy: -1.4
+            });
+        }
+
+        function drawPlayerAirplane(x, y, w, h) {
+            ctx.save();
+            ctx.translate(x + w / 2, y + h / 2);
+
+            // Shadow
+            ctx.fillStyle = 'rgba(0,0,0,0.15)';
+            ctx.beginPath();
+            ctx.ellipse(0, 6, w * 0.45, h * 0.25, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Main Wing (Yellow)
+            ctx.fillStyle = '#facc15';
+            ctx.strokeStyle = '#854d0e';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.roundRect(-w / 2, -6, w, 18, 9);
+            ctx.fill();
+            ctx.stroke();
+
+            // Fuselage Body (Bright Red)
+            ctx.fillStyle = '#ef4444';
+            ctx.strokeStyle = '#991b1b';
+            ctx.beginPath();
+            ctx.roundRect(-14, -h / 2 + 4, 28, h - 8, 12);
+            ctx.fill();
+            ctx.stroke();
+
+            // Cockpit Windshield (Sky Blue)
+            ctx.fillStyle = '#bae6fd';
+            ctx.beginPath();
+            ctx.arc(0, -2, 9, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Spinning Front Propeller
+            ctx.fillStyle = '#e2e8f0';
+            const propWidth = 22 * Math.abs(Math.sin(performance.now() * 0.025)) + 6;
+            ctx.fillRect(-propWidth / 2, -h / 2, propWidth, 4);
+
+            ctx.restore();
+        }
+
+        function drawTargetBalloon(t) {
+            ctx.save();
+
+            // Hot air balloon / parachute top dome
+            const centerX = t.x + t.width / 2;
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 18, t.y - 12);
+            ctx.lineTo(centerX - 10, t.y);
+            ctx.moveTo(centerX + 18, t.y - 12);
+            ctx.lineTo(centerX + 10, t.y);
+            ctx.stroke();
+
+            ctx.fillStyle = t.borderColor;
+            ctx.beginPath();
+            ctx.arc(centerX, t.y - 12, 20, Math.PI, 0, false);
+            ctx.fill();
+
+            // Banner Box carrying the sentence
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = t.borderColor;
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            ctx.roundRect(t.x, t.y, t.width, t.height, 14);
+            ctx.fill();
+            ctx.stroke();
+
+            // Top stripe inside banner
+            ctx.fillStyle = t.bgColor;
+            ctx.beginPath();
+            ctx.roundRect(t.x + 3, t.y + 3, t.width - 6, 14, 8);
+            ctx.fill();
+
+            // Sentence Text
+            ctx.fillStyle = '#0f172a';
+            ctx.font = '800 13.5px Nunito, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(t.text, centerX, t.y + t.height / 2 + 4, t.width - 16);
+
+            ctx.restore();
+        }
+
+        function drawIdleScene() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPlayerAirplane(canvas.width / 2 - 37, canvas.height - 76, 74, 58);
+        }
+
+        function triggerGameOver() {
+            gameState.running = false;
+            playSound('fanfare');
+
+            const overlay = document.getElementById('gameOverlay');
+            overlay.classList.remove('hidden');
+            document.getElementById('overlayTitle').textContent = 'Permainan Selesai! 🎖️';
+            document.getElementById('overlayDesc').innerHTML =
+                `Hebat sekali Kapten <strong>appState.studentName||'Cilik'</strong>!Kamuberhasilmengumpulkanskor<strong>{gameState.score} Poin</strong>.<br>Yuk main lagi atau lanjut ke Evaluasi!`;
+            document.getElementById('overlayBtnText').textContent = 'MAIN LAGI!';
+        }
+
+        function gameLoop() {
+            if (!gameState.running) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Draw & Move Background Clouds
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+            gameState.bgClouds.forEach(c => {
+                c.x += c.speed;
+                if (c.x - c.r * 2 > canvas.width) c.x = -60;
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+                ctx.arc(c.x + c.r * 0.8, c.y + 4, c.r * 0.75, 0, Math.PI * 2);
+                ctx.arc(c.x - c.r * 0.8, c.y + 6, c.r * 0.7, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // 2. Update Player Position
+            if (gameState.player.moveLeft) {
+                gameState.player.x = Math.max(10, gameState.player.x - gameState.player.speed);
+            }
+            if (gameState.player.moveRight) {
+                gameState.player.x = Math.min(canvas.width - gameState.player.width - 10, gameState.player.x + gameState.player.speed);
+            }
+
+            // 3. Spawn Target Balloons
+            gameState.spawnTimer++;
+            if (gameState.spawnTimer >= gameState.spawnInterval) {
+                gameState.spawnTimer = 0;
+                spawnTargetBalloon();
+            }
+
+            // 4. Update & Draw Bullets
+            for (let i = gameState.bullets.length - 1; i >= 0; i--) {
+                const b = gameState.bullets[i];
+                b.y -= b.speed;
+
+                // Draw glowing star bullet
+                ctx.fillStyle = '#fde047';
+                ctx.strokeStyle = '#ca8a04';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                if (b.y < -15) {
+                    gameState.bullets.splice(i, 1);
+                }
+            }
+
+            // 5. Update & Draw Targets + Check Collisions
+            for (let i = gameState.targets.length - 1; i >= 0; i--) {
+                const t = gameState.targets[i];
+                t.y += t.speed;
+                drawTargetBalloon(t);
+
+                // Check bullet collision with target
+                let hitByBullet = false;
+                for (let j = gameState.bullets.length - 1; j >= 0; j--) {
+                    const b = gameState.bullets[j];
+                    if (
+                        b.x + b.radius > t.x &&
+                        b.x - b.radius < t.x + t.width &&
+                        b.y + b.radius > t.y &&
+                        b.y - b.radius < t.y + t.height
+                    ) {
+                        gameState.bullets.splice(j, 1);
+                        hitByBullet = true;
+                        break;
+                    }
+                }
+
+                if (hitByBullet) {
+                    const centerX = t.x + t.width / 2;
+                    const centerY = t.y + t.height / 2;
+
+                    if (t.isInvitation) {
+                        // Shot a valid Kalimat Ajakan!
+                        playSound('hitGood');
+                        gameState.score += 20;
+                        createExplosion(centerX, centerY, '#4ade80');
+                        addFloatingText('+20 Kalimat Ajakan! ⭐', centerX, centerY, '#15803d');
+                    } else {
+                        // Shot a non-invitation sentence!
+                        playSound('hitBad');
+                        gameState.lives -= 1;
+                        createExplosion(centerX, centerY, '#f87171');
+                        addFloatingText('Bukan Kalimat Ajakan! -1 ❤️', centerX, centerY, '#b91c1c');
+                    }
+
+                    gameState.targets.splice(i, 1);
+                    updateGameHUD();
+
+                    if (gameState.lives <= 0) {
+                        triggerGameOver();
+                        return;
+                    }
+                    continue;
+                }
+
+                // Remove target if it passes the bottom of the screen
+                if (t.y > canvas.height + 30) {
+                    if (t.isInvitation) {
+                        // Gently remind student if an invitation sentence escaped
+                        addFloatingText('Kalimat Ajakan lewat!', t.x + t.width / 2, canvas.height - 25, '#0369a1');
+                    }
+                    gameState.targets.splice(i, 1);
+                }
+            }
+
+            // 6. Draw Player Airplane
+            drawPlayerAirplane(gameState.player.x, gameState.player.y, gameState.player.width, gameState.player.height);
+
+            // 7. Update & Draw Particles
+            for (let i = gameState.particles.length - 1; i >= 0; i--) {
+                const p = gameState.particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= 0.03;
+                if (p.alpha <= 0) {
+                    gameState.particles.splice(i, 1);
+                    continue;
+                }
+                ctx.save();
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            // 8. Update & Draw Floating Score Popups
+            for (let i = gameState.floatingTexts.length - 1; i >= 0; i--) {
+                const ft = gameState.floatingTexts[i];
+                ft.y += ft.vy;
+                ft.alpha -= 0.022;
+                if (ft.alpha <= 0) {
+                    gameState.floatingTexts.splice(i, 1);
+                    continue;
+                }
+                ctx.save();
+                ctx.globalAlpha = ft.alpha;
+                ctx.font = '800 16px Fredoka, sans-serif';
+                ctx.fillStyle = '#ffffff';
+                ctx.strokeStyle = ft.color;
+                ctx.lineWidth = 4;
+                ctx.textAlign = 'center';
+                ctx.strokeText(ft.text, ft.x, ft.y);
+                ctx.fillText(ft.text, ft.x, ft.y);
+                ctx.restore();
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Keyboard Controls for Airplane Game
+        window.addEventListener('keydown', (e) => {
+            if (!gameState.running) return;
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+                gameState.player.moveLeft = true;
+            } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+                gameState.player.moveRight = true;
+            } else if (e.key === ' ' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                playerShoot();
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+                gameState.player.moveLeft = false;
+            } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+                gameState.player.moveRight = false;
+            }
+        });
+
+        // Touch & Mouse Controls for On-Screen Buttons
+        function bindHoldButton(btnId, onDown, onUp) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            btn.addEventListener('mousedown', onDown);
+            btn.addEventListener('mouseup', onUp);
+            btn.addEventListener('mouseleave', onUp);
+            btn.addEventListener('touchstart', (e) => { e.preventDefault(); onDown(); }, { passive: false });
+            btn.addEventListener('touchend', (e) => { e.preventDefault(); onUp(); }, { passive: false });
+        }
+
+        bindHoldButton('btnMoveLeft',
+            () => { gameState.player.moveLeft = true; },
+            () => { gameState.player.moveLeft = false; }
+        );
+        bindHoldButton('btnMoveRight',
+            () => { gameState.player.moveRight = true; },
+            () => { gameState.player.moveRight = false; }
+        );
+
+        /* -----------------------------------------------------------
+         * 7. EVALUASI (GRADE 2 MULTIPLE CHOICE QUIZ)
+         * ----------------------------------------------------------- */
+        const quizQuestions = [
+            {
+                q: "1. Kalimat yang digunakan untuk mengajak orang lain melakukan sesuatu bersama-sama disebut kalimat ....",
+                options: [
+                    "A. Kalimat Tanya",
+                    "B. Kalimat Ajakan",
+                    "C. Kalimat Larangan"
+                ],
+                correct: 1,
+                explanation: "Benar! Kalimat ajakan digunakan untuk mengajak orang lain melakukan kegiatan bersama-sama."
+            },
+            {
+                q: "2. Kata-kata yang biasa digunakan pada awal Kalimat Ajakan adalah ....",
+                options: [
+                    "A. Ayo, Mari, dan Yuk",
+                    "B. Apa, Siapa, dan Kapan",
+                    "C. Jangan, Dilarang, dan Tidak boleh"
+                ],
+                correct: 0,
+                explanation: "Tepat sekali! Kata 'Ayo', 'Mari', dan 'Yuk' adalah ciri khas kalimat ajakan."
+            },
+            {
+                q: "3. Manakah di bawah ini yang merupakan contoh Kalimat Ajakan yang tepat?",
+                options: [
+                    "A. Di mana kamu membeli buku gambar itu?",
+                    "B. Jangan membuang sampah sembarangan!",
+                    "C. Ayo, kita bermain lompat tali di halaman!"
+                ],
+                correct: 2,
+                explanation: "Hebat! 'Ayo, kita bermain lompat tali di halaman!' adalah kalimat ajakan karena menggunakan kata 'Ayo'."
+            },
+            {
+                q: "4. Lani ingin mengajak Dayu mencuci tangan sebelum makan. Kalimat ajakan yang sopan adalah ....",
+                options: [
+                    "A. Dayu, ayo kita mencuci tangan sebelum makan!",
+                    "B. Dayu, mengapa tanganmu kotor sekali?",
+                    "C. Dayu, cepat cuci tanganmu sekarang juga!"
+                ],
+                correct: 0,
+                explanation: "Pintar! Mengajak teman harus menggunakan kata 'ayo' dengan sopan dan ramah."
+            },
+            {
+                q: "5. '..., kita merapikan buku-buku di pojok baca bersama-sama!' Kata yang tepat untuk melengkapi kalimat ajakan tersebut adalah ....",
+                options: [
+                    "A. Siapa",
+                    "B. Mari",
+                    "C. Jangan"
+                ],
+                correct: 1,
+                explanation: "Betul! Kata 'Mari' sangat tepat untuk melengkapi kalimat ajakan tersebut."
+            },
+            {
+                q: "6. Pada akhir penulisan kalimat ajakan, biasanya diberi tanda baca ....",
+                options: [
+                    "A. Tanda Tanya (?)",
+                    "B. Tanda Seru (!)",
+                    "C. Tanda Koma (,)"
+                ],
+                correct: 1,
+                explanation: "Seratus untukmu! Kalimat ajakan diakhiri dengan tanda seru (!)."
+            }
+        ];
+
+        const quizState = {
+            currentIndex: 0,
+            correctCount: 0,
+            answered: false
+        };
+
+        function renderQuizQuestion() {
+            document.getElementById('quizContainer').classList.remove('hidden');
+            document.getElementById('quizResultBox').classList.add('hidden');
+            document.getElementById('quizFeedbackBox').classList.add('hidden');
+            document.getElementById('btnNextQuestion').classList.add('hidden');
+
+            quizState.answered = false;
+            const currentQ = quizQuestions[quizState.currentIndex];
+
+            document.getElementById('quizCurrentNum').textContent = quizState.currentIndex + 1;
+            document.getElementById('quizTotalNum').textContent = quizQuestions.length;
+            document.getElementById('quizQuestionText').textContent = currentQ.q;
+
+            const listEl = document.getElementById('quizOptionsList');
+            listEl.innerHTML = '';
+
+            currentQ.options.forEach((optText, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-4 rounded-2xl border-3 border-sky-200 bg-white hover:bg-sky-50 font-title font-bold text-lg text-slate-800 transition-all shadow-sm flex items-center justify-between';
+                btn.innerHTML = `<span>${optText}</span><i class="fa-regular fa-circle text-sky-400"></i>`;
+                btn.onclick = () => selectQuizAnswer(idx, btn);
+                listEl.appendChild(btn);
+            });
+        }
+
+        function selectQuizAnswer(selectedIndex, btnElement) {
+            if (quizState.answered) return;
+            quizState.answered = true;
+
+            const currentQ = quizQuestions[quizState.currentIndex];
+            const allButtons = document.getElementById('quizOptionsList').children;
+            const feedbackBox = document.getElementById('quizFeedbackBox');
+
+            for (let i = 0; i < allButtons.length; i++) {
+                allButtons[i].disabled = true;
+                if (i === currentQ.correct) {
+                    allButtons[i].className = 'w-full text-left p-4 rounded-2xl border-3 border-emerald-500 bg-emerald-100 font-title font-bold text-lg text-emerald-950 flex items-center justify-between';
+                    allButtons[i].querySelector('i').className = 'fa-solid fa-circle-check text-emerald-600 text-xl';
+                }
+            }
+
+            if (selectedIndex === currentQ.correct) {
+                quizState.correctCount++;
+                playSound('hitGood');
+                feedbackBox.className = 'rounded-2xl p-4 border-2 border-emerald-400 bg-emerald-50 text-emerald-900 font-bold text-base';
+                feedbackBox.innerHTML = `✅ <strong>Jawabanmu Benar!</strong> ${currentQ.explanation}`;
+            } else {
+                playSound('hitBad');
+                btnElement.className = 'w-full text-left p-4 rounded-2xl border-3 border-rose-500 bg-rose-100 font-title font-bold text-lg text-rose-950 flex items-center justify-between';
+                btnElement.querySelector('i').className = 'fa-solid fa-circle-xmark text-rose-600 text-xl';
+                feedbackBox.className = 'rounded-2xl p-4 border-2 border-rose-400 bg-rose-50 text-rose-900 font-bold text-base';
+                feedbackBox.innerHTML = `💡 <strong>Kurang Tepat.</strong> ${currentQ.explanation}`;
+            }
+
+            feedbackBox.classList.remove('hidden');
+            const nextBtn = document.getElementById('btnNextQuestion');
+            nextBtn.classList.remove('hidden');
+            nextBtn.innerHTML = quizState.currentIndex === quizQuestions.length - 1
+                ? 'Lihat Nilai Akhir <i class="fa-solid fa-flag-checkered ml-2"></i>'
+                : 'Soal Berikutnya <i class="fa-solid fa-arrow-right ml-2"></i>';
+        }
+
+        function nextQuizQuestion() {
+            playSound('click');
+            if (quizState.currentIndex < quizQuestions.length - 1) {
+                quizState.currentIndex++;
+                renderQuizQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            playSound('fanfare');
+            appState.quizCompleted = true;
+            appState.quizScore = Math.round((quizState.correctCount / quizQuestions.length) * 100);
+
+            document.getElementById('quizContainer').classList.add('hidden');
+            document.getElementById('quizResultBox').classList.remove('hidden');
+            document.getElementById('quizFinalScoreText').textContent = appState.quizScore + ' / 100';
+        }
+
+        function resetQuiz() {
+            playSound('click');
+            quizState.currentIndex = 0;
+            quizState.correctCount = 0;
+            appState.quizCompleted = false;
+            renderQuizQuestion();
+        }
+
+        /* -----------------------------------------------------------
+         * 8. UMPAN BALIK & STUDENT REFLECTION
+         * ----------------------------------------------------------- */
+        function updateFeedbackView() {
+            document.getElementById('fbStudentName').textContent = appState.studentName || 'Kapten Cilik';
+            document.getElementById('fbStudentClass').textContent = 'Kelas ' + (appState.studentClass || '2 SD').replace(/^kelas\s*/i, '');
+            document.getElementById('fbGameScore').textContent = appState.highScoreGame + ' Poin';
+            document.getElementById('fbQuizScore').textContent = appState.quizScore + ' / 100';
+
+            // Determine Star Rating & Personalized Message
+            let stars = '⭐⭐⭐';
+            let badge = 'Pilot Pemula Semangat';
+            let message = 'Tetap semangat belajar ya! Yuk baca kembali Materi Inti dan mainkan lagi game pesawatnya!';
+
+            if (appState.quizScore >= 80 || appState.highScoreGame >= 80) {
+                stars = '⭐⭐⭐⭐⭐';
+                badge = 'Kapten Pilot Bintang Utama!';
+                message = `Luar biasa, ${appState.studentName || 'Kapten'}! Kamu sudah sangat pintar memahami ciri-ciri Kalimat Ajakan (Ayo, Mari, Yuk) dan menggunakannya dengan sopan!`;
+            } else if (appState.quizScore >= 50 || appState.highScoreGame >= 40) {
+                stars = '⭐⭐⭐⭐';
+                badge = 'Pilot Hebat Bahasa Indonesia';
+                message = `Bagus sekali, ${appState.studentName || 'Kapten'}! Kamu sudah mengenal Kalimat Ajakan. Terus berlatih agar nilaimu semakin sempurna!`;
+            }
+
+            document.getElementById('fbStars').textContent = stars;
+            document.getElementById('fbBadgeTitle').textContent = badge;
+            document.getElementById('fbMessage').textContent = `"${message}"`;
+        }
+
+        function selectFeeling(feelingText) {
+            playSound('hitGood');
+            appState.studentFeeling = feelingText;
+            document.querySelectorAll('.feel-btn').forEach(btn => {
+                btn.classList.remove('border-amber-500', 'bg-amber-100', 'scale-105');
+            });
+            event.currentTarget.classList.add('border-amber-500', 'bg-amber-100', 'scale-105');
+
+            const savedEl = document.getElementById('feelingSavedText');
+            savedEl.textContent = `✨ Terima kasih appState.studentName||'Kapten'!Perasaanmuhariini:"{feelingText}" sudah tercatat.`;
+            savedEl.classList.remove('hidden');
+        }
+
+        // Start window load initialization
+        window.onload = function () {
+            resizeGameCanvas();
+            drawIdleScene();
+        };
+    </script>
+</body>
+</html>
+
